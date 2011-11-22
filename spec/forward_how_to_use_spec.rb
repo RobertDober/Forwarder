@@ -11,8 +11,8 @@ describe Forwarder do
   
   it "but it can be used via extend" do
     Class.new do
-      forward :size, to: :content
-      def initiali
+      extend Forwarder
+      forward :size, to: :@content
     end
   end
 end # describe Forwarder

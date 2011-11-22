@@ -2,6 +2,7 @@ require 'forwardable'
 module Forwarder
   def forward message, opts={}
     return forwarding_with message, opts if opts[:with]
+    return forwarding_to_object message, opts if opts[:to_object]
     to = opts.fetch :to do
       raise ArgumentError, "need :to keyword param to indicate target of delegation"
     end
@@ -24,6 +25,11 @@ module Forwarder
 
   private
 
+  def forwarding_to_object message, opts
+    target = opts[ :to_object ]
+    forwarding_with message, opts.merge( to: [ target ], with: opts.fetch( :with, [] ) )
+  end
+
   def forwarding_with message, opts
     to = opts.fetch :to do
       raise ArgumentError, "need :to keyword param to indicate target of delegation"
@@ -32,9 +38,13 @@ module Forwarder
     as = opts.fetch(:as, message )
 
     define_method :__eval_receiver__ do | name |
+      if Array === name
+        return name.first
+      end
       case "#{name}"
       when /\A@/
         instance_variable_get name
+
       else
         send name rescue private_send name
       end
