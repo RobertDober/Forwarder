@@ -1,5 +1,5 @@
 require 'forwardable'
-class Module
+module Forwarder
   def forward message, opts={}
     return forwarding_with message, opts if opts[:with]
     to = opts.fetch :to do

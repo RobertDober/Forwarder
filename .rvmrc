@@ -1,0 +1,7 @@
+rvm use 1.9.3@forwarder
+
+rspecoptions=''
+if test -r rspec.opts ; then
+    rspecoptions='-O rspec.opts '
+fi
+alias bsp="bundle exec rspec ${rspecoptions}"
