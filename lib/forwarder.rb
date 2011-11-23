@@ -10,7 +10,6 @@ module Forwarder
     raise ArgumentError, "need :to keyword param to indicate target of delegation"
   end
 
-
   def forward_all *messages
     opts = messages.pop
     raise ArgumentError, "need a Hash as last arg" unless Hash === opts
@@ -62,13 +61,8 @@ module Forwarder
     application, as, with = opts.values_at( :applying, :as, :with )
     as ||= message
 
-    define_method( :__eval_receiver__, &Meta.eval_receiver_body )
-    define_method message do |*args, &blk|
-      arguments = ( [ with ].flatten + args ).compact
-      rcv = __eval_receiver__( to )
-#      p as: as, to: to, rcv: rcv, args: arguments, app: application
-      rcv.send( as, *arguments, &(application||blk) )
-    end
+   # define_method( :__eval_receiver__, &Meta.eval_receiver_body )
+    define_method( message, &Meta.eval_body( application, as, to, with ) )
   end
     
 end # class Module
