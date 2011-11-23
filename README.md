@@ -28,12 +28,18 @@ in the instance's context. If an arbitrary object shall be the receiver of the
 message, than the ```:to``` keyword can be replaced by the ```:to_object```
 keyword parameter. 
 
+<<<<<<< HEAD
 ruby```
+=======
+>>>>>>> 8e52ca9e9817a23170ff70c8add2ab1af2a33f00
        class Employee
          extend Forwarder
          forward :complaints, to: :boss
        end
+<<<<<<< HEAD
 ```
+=======
+>>>>>>> 8e52ca9e9817a23170ff70c8add2ab1af2a33f00
 
 This design, implementing some wishful thinking that will probably not pass
 acceptance tests, will send the ```complaints``` message, sent to an instance
