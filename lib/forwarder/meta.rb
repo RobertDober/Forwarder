@@ -13,10 +13,10 @@ module Forwarder
       case name
       when Proc
         context.instance_eval( &name )
-      when Array
-        name.first
       when String, Symbol
         Meta.eval_symbolic_receiver name, context
+      when Array
+        name.first
       end
     end
     def eval_receiver_body
