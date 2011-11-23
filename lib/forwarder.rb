@@ -1,17 +1,15 @@
 require 'forwardable'
+
+require 'forwarder/meta'
 module Forwarder
+
   def forward message, opts={}, &blk
-    opts = opts.merge applying: blk if blk
-    return forwarding_with message, opts if opts[:applying] 
-    return forwarding_with message, opts if opts[:with]
-    return forwarding_to_object message, opts if opts[:to_object]
-    to = opts.fetch :to do
-      raise ArgumentError, "need :to keyword param to indicate target of delegation"
-    end
-    extend Forwardable
-    as = opts.fetch( :as, message )
-    def_delegator to, as, message
+    return if forward_with_meta message, opts, blk
+    forward_with_forwardable message, opts
+  rescue IndexError
+    raise ArgumentError, "need :to keyword param to indicate target of delegation"
   end
+
 
   def forward_all *messages
     opts = messages.pop
@@ -31,6 +29,26 @@ module Forwarder
 
   private
 
+  def forward_with_forwardable message, opts
+    to = opts.fetch :to
+    extend Forwardable
+    as = opts.fetch( :as, message )
+    def_delegator to, as, message
+  end
+
+  # Transform blk into a normal parameter call the metaprogramming
+  # stuff if needed and return nil iff we can do it with Forwardable
+  def forward_with_meta message, opts, blk
+    opts = opts.merge applying: blk if blk
+    if opts[:applying] || opts[:with]
+      forwarding_with message, opts
+      true
+    elsif opts[:to_object]
+      forwarding_to_object message, opts
+      true
+    end
+  end
+
   def forwarding_to_object message, opts
     target = opts[ :to_object ]
     forwarding_with message, opts.merge( to: [ target ], with: opts.fetch( :with, [] ) )
@@ -41,24 +59,10 @@ module Forwarder
     to = opts.fetch :to do
       raise ArgumentError, "need :to keyword param to indicate target of delegation"
     end
-    with = opts[:with]
-    as = opts.fetch(:as, message )
-    application = opts[:applying]
+    application, as, with = opts.values_at( :applying, :as, :with )
+    as ||= message
 
-    define_method :__eval_receiver__ do | name |
-      if Proc === name
-        return instance_eval( &name )
-      end
-      if Array === name
-        return name.first
-      end
-      case "#{name}"
-      when /\A@/
-        instance_variable_get name
-      else
-        send name rescue private_send name
-      end
-    end
+    define_method( :__eval_receiver__, &Meta.eval_receiver_body )
     define_method message do |*args, &blk|
       arguments = ( [ with ].flatten + args ).compact
       rcv = __eval_receiver__( to )
