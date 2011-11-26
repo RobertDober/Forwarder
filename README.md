@@ -77,8 +77,8 @@ Or alternatively
       end
 
 
-Again one could argue that a message chain forwarding approach would be nice
-here, it might as well be implemented in a later version.
+The above, however is a little bit verbose, we can shorten it with the `:to_chain`
+parameter
 
       class Boss
         extend Forwarder
