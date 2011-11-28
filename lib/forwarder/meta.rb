@@ -1,6 +1,9 @@
 module Forwarder
   module Meta extend self
+    # Special Target Representations
+    SelfContainer   = Object.new
     ObjectContainer = Struct.new( :object )
+
     def eval_body application, as, to, with
       lambda do |*args, &blk|
         arguments = ( [ with ].flatten + args ).compact
@@ -24,6 +27,8 @@ module Forwarder
       when String, Symbol
 #        p name: name, context: context
         Meta.eval_symbolic_receiver name, context
+      when SelfContainer
+        context
       when ObjectContainer
         name.object
       when Array
