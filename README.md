@@ -34,8 +34,8 @@ keyword parameter.
        end
 
 This design, implementing some wishful thinking that will probably not pass
-acceptance tests, will send the ```complaints``` message, sent to an instance
-of ```Employee``` to the object returned by her ```boss``` method.
+acceptance tests, will forward the ```complaints``` message, sent to an instance
+of ```Employee```, to the object returned by this very instance's ```boss``` method.
 
 The following adjustment was made, in desperate hope to fix the *bug*:
 
@@ -44,7 +44,9 @@ The following adjustment was made, in desperate hope to fix the *bug*:
         forward :complaints, to: :boss, as: :suggestions
       end
 
-This behavior being clearly preferable to the one implemented before.
+This behavior being clearly preferable to the one implemented before because the
+receiver of ```complaints``` is still forwarding the call to the result of the
+call of its ```boss``` method, but to the ```suggestion``` method.
 
 Finally, however, the implementation looked like this
 
