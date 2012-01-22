@@ -19,7 +19,9 @@ steroids.
 
 ## Examples ##
 
-* forward
+### forward ###
+
+* forward to:
 
 Forwards to a target. The target must be specified by the ```:to``` keyword 
 parameter and can be either a ```Symbol``` (or ```String```), thus representing 
@@ -79,6 +81,8 @@ Or alternatively
       end
 
 
+* forward to_chain:
+
 The above, however is a little bit verbose, we can shorten it with the `:to_chain`
 parameter
 
@@ -86,6 +90,10 @@ parameter
         extend Forwarder
         forward_all :complaints, :problems, :tasks, to_chain: [:@employees, :first]
       end
+
+As you might guess, the `complaints` message is sent to the result of sending first
+to the `@employees` instance variable. As (no pun intended) with the `to:` version
+of `forward`, one can change the message name with the `as:` parameter.
 
 ## License ##
 
