@@ -11,4 +11,7 @@ Gem::Specification.new do |s|
   s.files       = Dir.glob("lib/**/*.rb")
   s.files      += %w{LICENSE README.md}
   s.homepage    = 'https://github.com/RobertDober/Forwarder'
+  s.license     = %w{MIT}
+
+  s.required_ruby_version = '>= 1.8.7'
 end
