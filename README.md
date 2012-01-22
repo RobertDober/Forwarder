@@ -56,7 +56,7 @@ Finally, however, the implementation looked like this
       end
 
 However this did not work as no ```first_employee``` was defined. This seems
-simple enough a task, so that a method for this seems to much code bloat, here
+simple enough a task, so that a method for this seems too much code bloat, here
 are two possible implementations with ```Forwarder```
 
       class Boss
@@ -86,3 +86,8 @@ parameter
         extend Forwarder
         forward_all :complaints, :problems, :tasks, to_chain: [:@employees, :first]
       end
+
+## License ##
+
+This software is licensed under the MIT license, which shall be attached to any deliverable of
+this software (LICENSE) or can be found here http://www.opensource.org/licenses/MIT 
