@@ -3,6 +3,7 @@ require 'forwardable'
 require 'forwarder/meta'
 module Forwarder
 
+  # delegates (forwards) a message to an object (indicated by :to)
   def forward message, opts={}, &blk
     opts = parse_opts opts, blk
 #    p opts: opts
@@ -24,11 +25,15 @@ module Forwarder
 
   private
 
+  # Triggered by the presence of :to_object in forward's parameters
   def forwarding_to_object message, opts
     target = opts[ :to_object ]
     forwarding_with message, opts.merge( to: Meta::ObjectContainer.new(target), with: opts.fetch( :with, [] ) )
   end
 
+  # Handles the cases, where Forwardable can be used behind the scenes
+  # as a matter of fact :to was indicating a method or instance variable
+  # and :as was passed in (or defaults to the original message).
   def forward_with_forwardable message, opts
     to = opts.fetch :to
     extend Forwardable
@@ -36,6 +41,7 @@ module Forwarder
     def_delegator to, as, message
   end
 
+  # Triggered by the presence of :to_chain in forward's parameters
   def forward_with_chain message, opts
     return false unless opts[:to_chain]
     forwarding_with message, opts

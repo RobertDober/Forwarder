@@ -4,4 +4,6 @@ source "http://rubygems.org"
 
 gem 'rspec', '~>2.7.0'
 
+gem 'redcarpet'
+gem 'yard'
 #gem 'ruby-debug-base19x'
