@@ -54,12 +54,16 @@ Finally, however, the implementation looked like this
 
       class Boss
         extend Forwarder
-        forward_all :complaints, :problems, :tasks, to: first_employee
+        forward :complaints, to: first_employee
+        forward :problems, to: first_employee
+        forward :tasks, to: first_employee
       end
 
 However this did not work as no ```first_employee``` was defined. This seems
 simple enough a task, so that a method for this seems too much code bloat, here
-are two possible implementations with ```Forwarder```
+are two possible implementations with ```Forwarder```. The other thing that
+catches (or should, at least) the reader's eyes is the terrible code repetition.
+The next chapter describing `forward_all`, will show us, how to get rid of this.
 
       class Boss
         extend Forwarder
@@ -91,11 +95,18 @@ parameter
         forward_all :complaints, :problems, :tasks, to_chain: [:@employees, :first]
       end
 
-As you might guess, the `complaints` message is sent to the result of sending first
+As you might guess, the `complaints` message is sent to the result of sending `first`
 to the `@employees` instance variable. As (no pun intended) with the `to:` version
 of `forward`, one can change the message name with the `as:` parameter.
 
-## License ##
+### forward_all ###
+
+`forward_all` allows us to forward more then one message to a target. It is a shortcut
+for calling `forward` to each of its method parameters
+
+
+
+# License #
 
 This software is licensed under the MIT license, which shall be attached to any deliverable of
 this software (LICENSE) or can be found here http://www.opensource.org/licenses/MIT 
