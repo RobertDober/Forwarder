@@ -19,7 +19,9 @@ steroids.
 
 ## Examples ##
 
-* forward
+### forward ###
+
+* forward to:
 
 Forwards to a target. The target must be specified by the ```:to``` keyword 
 parameter and can be either a ```Symbol``` (or ```String```), thus representing 
@@ -34,8 +36,8 @@ keyword parameter.
        end
 
 This design, implementing some wishful thinking that will probably not pass
-acceptance tests, will send the ```complaints``` message, sent to an instance
-of ```Employee``` to the object returned by her ```boss``` method.
+acceptance tests, will forward the ```complaints``` message, sent to an instance
+of ```Employee```, to the object returned by this very instance's ```boss``` method.
 
 The following adjustment was made, in desperate hope to fix the *bug*:
 
@@ -44,18 +46,24 @@ The following adjustment was made, in desperate hope to fix the *bug*:
         forward :complaints, to: :boss, as: :suggestions
       end
 
-This behavior being clearly preferable to the one implemented before.
+This behavior being clearly preferable to the one implemented before because the
+receiver of ```complaints``` is still forwarding the call to the result of the
+call of its ```boss``` method, but to the ```suggestion``` method.
 
 Finally, however, the implementation looked like this
 
       class Boss
         extend Forwarder
-        forward_all :complaints, :problems, :tasks, to: first_employee
+        forward :complaints, to: first_employee
+        forward :problems, to: first_employee
+        forward :tasks, to: first_employee
       end
 
 However this did not work as no ```first_employee``` was defined. This seems
-simple enough a task, so that a method for this seems to much code bloat, here
-are two possible implementations with ```Forwarder```
+simple enough a task, so that a method for this seems too much code bloat, here
+are two possible implementations with ```Forwarder```. The other thing that
+catches (or should, at least) the reader's eyes is the terrible code repetition.
+The next chapter describing `forward_all`, will show us, how to get rid of this.
 
       class Boss
         extend Forwarder
@@ -77,6 +85,8 @@ Or alternatively
       end
 
 
+* forward to_chain:
+
 The above, however is a little bit verbose, we can shorten it with the `:to_chain`
 parameter
 
@@ -84,3 +94,19 @@ parameter
         extend Forwarder
         forward_all :complaints, :problems, :tasks, to_chain: [:@employees, :first]
       end
+
+As you might guess, the `complaints` message is sent to the result of sending `first`
+to the `@employees` instance variable. As (no pun intended) with the `to:` version
+of `forward`, one can change the message name with the `as:` parameter.
+
+### forward_all ###
+
+`forward_all` allows us to forward more then one message to a target. It is a shortcut
+for calling `forward` to each of its method parameters
+
+
+
+# License #
+
+This software is licensed under the MIT license, which shall be attached to any deliverable of
+this software (LICENSE) or can be found here http://www.opensource.org/licenses/MIT 

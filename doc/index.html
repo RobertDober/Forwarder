@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '';
+  if (relpath != '') relpath += '/';
+</script>
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html" title="Index">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a id="class_list_link" href="#">Class List</a>
+  
+    <a id="method_list_link" href="#">Method List</a>
+  
+    <a id="file_list_link" href="#">File List</a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><div id='filecontents'><h1>Forwarder</h1>
+
+<p>Delegation made readable.</p>
+
+<h2>Rational</h2>
+
+<p>It seems that Ruby&#39;s built in <code>Forwardable</code> module does a decent job
+to provide for delegation. However its syntax is more than terse, it is, IMHO,
+unreadable. At a certain moment it came to me that relearning the correct
+application of <code>def_delegator</code>, frequent usage non withstanding is <em>not</em>
+what I want to use my time for.</p>
+
+<p>From that desire <code>Forwarder</code> was created. As <code>Forwardable</code> it is not
+intruisive but once a module is extended with it the following methods spring
+into live: <code>forward</code>, <code>forward_all</code> and <code>forward_to_self</code>. The
+first two replace and enhance the functionality of <code>def_delegator</code> and
+<code>def_delegators</code>, while the third is a kind of a <code>alias_method</code> on
+steroids.</p>
+
+<h2>Examples</h2>
+
+<ul>
+<li>forward</li>
+</ul>
+
+<p>Forwards to a target. The target must be specified by the <code>:to</code> keyword 
+parameter and can be either a <code>Symbol</code> (or <code>String</code>), thus representing 
+an instance method or an instance variable, a lambda that will be evaluated 
+in the instance&#39;s context. If an arbitrary object shall be the receiver of the
+message, than the <code>:to</code> keyword can be replaced by the <code>:to_object</code>
+keyword parameter. </p>
+
+<pre class="code">   <span class='kw'>class</span> <span class='const'>Employee</span>
+     <span class='id identifier rubyid_extend'>extend</span> <span class='const'>Forwarder</span>
+     <span class='id identifier rubyid_forward'>forward</span> <span class='symbol'>:complaints</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:boss</span>
+   <span class='kw'>end</span>
+</pre>
+
+<p>This design, implementing some wishful thinking that will probably not pass
+acceptance tests, will forward the <code>complaints</code> message, sent to an instance
+of <code>Employee</code>, to the object returned by this very instance&#39;s <code>boss</code> method.</p>
+
+<p>The following adjustment was made, in desperate hope to fix the <em>bug</em>:</p>
+
+<pre class="code">  <span class='kw'>class</span> <span class='const'>Employee</span>
+    <span class='id identifier rubyid_extend'>extend</span> <span class='const'>Forwarder</span>
+    <span class='id identifier rubyid_forward'>forward</span> <span class='symbol'>:complaints</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:boss</span><span class='comma'>,</span> <span class='label'>as:</span> <span class='symbol'>:suggestions</span>
+  <span class='kw'>end</span>
+</pre>
+
+<p>This behavior being clearly preferable to the one implemented before because the
+receiver of <code>complaints</code> is still forwarding the call to the result of the
+call of its <code>boss</code> method, but to the <code>suggestion</code> method.</p>
+
+<p>Finally, however, the implementation looked like this</p>
+
+<pre class="code">  <span class='kw'>class</span> <span class='const'>Boss</span>
+    <span class='id identifier rubyid_extend'>extend</span> <span class='const'>Forwarder</span>
+    <span class='id identifier rubyid_forward_all'>forward_all</span> <span class='symbol'>:complaints</span><span class='comma'>,</span> <span class='symbol'>:problems</span><span class='comma'>,</span> <span class='symbol'>:tasks</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='id identifier rubyid_first_employee'>first_employee</span>
+  <span class='kw'>end</span>
+</pre>
+
+<p>However this did not work as no <code>first_employee</code> was defined. This seems
+simple enough a task, so that a method for this seems too much code bloat, here
+are two possible implementations with <code>Forwarder</code></p>
+
+<pre class="code">  <span class='kw'>class</span> <span class='const'>Boss</span>
+    <span class='id identifier rubyid_extend'>extend</span> <span class='const'>Forwarder</span>
+    <span class='id identifier rubyid_forward'>forward</span> <span class='symbol'>:first_employee</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:@employees</span><span class='comma'>,</span> <span class='label'>as:</span> <span class='symbol'>:[]</span><span class='comma'>,</span> <span class='label'>with:</span> <span class='int'>0</span>
+    <span class='id identifier rubyid_forward_all'>forward_all</span> <span class='symbol'>:complaints</span><span class='comma'>,</span> <span class='symbol'>:problems</span><span class='comma'>,</span> <span class='symbol'>:tasks</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:first_employee</span>
+  <span class='kw'>end</span>
+</pre>
+
+<p>As a side note, I do not enourage the exposure of instance variables as in the
+example above, but I do not like to impose. As <code>Forwardable</code> can delegate to
+instance variables I decided to provide the same functionality with
+<code>Forwarder</code>.</p>
+
+<p>Or alternatively</p>
+
+<pre class="code">  <span class='kw'>class</span> <span class='const'>Boss</span>
+    <span class='id identifier rubyid_extend'>extend</span> <span class='const'>Forwarder</span>
+    <span class='id identifier rubyid_forward'>forward</span> <span class='symbol'>:first_employee</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='symbol'>:@employees</span><span class='comma'>,</span> <span class='label'>as:</span> <span class='symbol'>:first</span>
+    <span class='id identifier rubyid_forward_all'>forward_all</span> <span class='symbol'>:complaints</span><span class='comma'>,</span> <span class='symbol'>:problems</span><span class='comma'>,</span> <span class='symbol'>:tasks</span><span class='comma'>,</span> <span class='label'>to:</span> <span class='id identifier rubyid_first_employee'>first_employee</span>
+  <span class='kw'>end</span>
+</pre>
+
+<p>The above, however is a little bit verbose, we can shorten it with the <code>:to_chain</code>
+parameter</p>
+
+<pre class="code">  <span class='kw'>class</span> <span class='const'>Boss</span>
+    <span class='id identifier rubyid_extend'>extend</span> <span class='const'>Forwarder</span>
+    <span class='id identifier rubyid_forward_all'>forward_all</span> <span class='symbol'>:complaints</span><span class='comma'>,</span> <span class='symbol'>:problems</span><span class='comma'>,</span> <span class='symbol'>:tasks</span><span class='comma'>,</span> <span class='label'>to_chain:</span> <span class='lbracket'>[</span><span class='symbol'>:@employees</span><span class='comma'>,</span> <span class='symbol'>:first</span><span class='rbracket'>]</span>
+  <span class='kw'>end</span>
+</pre>
+
+<h2>License</h2>
+
+<p>This software is licensed under the MIT license, which shall be attached to any deliverable of
+this software (LICENSE) or can be found here http://www.opensource.org/licenses/MIT </p>
+</div></div>
+    
+    <div id="footer">
+  Generated on Sun Jan 22 17:03:53 2012 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.7.4 (ruby-1.9.2).
+</div>
+
+  </body>
+</html>
