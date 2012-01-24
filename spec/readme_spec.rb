@@ -78,4 +78,24 @@ describe "assuring that the examples in README behave as described" do
      end
    end # describe "parametrization without translation"
   end # describe "The forward Method"
+
+  describe "The forward_all Method" do
+    describe "with :to_chain target" do
+      before :each do
+        @worker_bees = worker_bees = double
+        @poor_worker_bee = double
+        @boss = Class.new do 
+          extend Forwarder
+          forward_all :complaints, :problems, :tasks, to_chain: [:@employees, :first]
+          define_method :initialize do
+            @employees = worker_bees
+          end
+        end
+      end
+      it "fowards complaints to the chain" do
+        @worker_bees.should_receive( :first ).and_return @poor_worker_bee
+        @poor_worker_bee.should_receive( :complaints )
+      end
+    end # describe "with :to_chain target"
+  end # describe "The forward_all Method"
 end # describe "assuring that the examples in README behave as described"
