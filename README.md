@@ -136,9 +136,12 @@ seems the right tool to use, let us see it's application at work:
         forward_all :complaints, :problems, :tasks, to_chain: [:@employees, :first]
       end
 
+Now we forward, almost anonymously to `@employeees.first` without defining a method, or
+forwarder to bridge this gap.
+
 As you might guess, the `complaints` message is sent to the result of sending `first`
 to the `@employees` instance variable. As (no pun intended) with the `to:` version
-of `forward`, one can change the message name with the `as:` parameter.
+of `forward`, one can change the message name with the `as:` parameter, aka *translation*.
 
 It is uncommon, but not impossible to use a *translation* in `forward_all`
 
@@ -160,7 +163,7 @@ for two reasons. Firstly by using `Forwarder` the performance hit notwithstandin
 you are not concerned by premature optimization but much more with clean, concise and readnale
 design. Secondly if you run into performance issues and profiling shows that a forward target
 is hit frequently, chances are that you found one of your performance bottlenecks. Just implement
-the forward lmanually as a method and you shoud see quite some improvement. Now I am sure
+the forward manually as a method and you shoud see quite some improvement. Now I am sure
 you'd wish that all your performance issues are *that* *easy* to fix.
 
 As I said: *Two* pieces of Good News!
