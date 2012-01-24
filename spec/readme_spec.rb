@@ -95,7 +95,32 @@ describe "assuring that the examples in README behave as described" do
       it "fowards complaints to the chain" do
         @worker_bees.should_receive( :first ).and_return @poor_worker_bee
         @poor_worker_bee.should_receive( :complaints )
+        @boss.new.complaints
+      end
+      it "forwards regardless of parameters" do
+        @worker_bees.should_receive( :first ).and_return @poor_worker_bee
+        @poor_worker_bee.should_receive( :complaints ).with( "text" )
+        @boss.new.complaints( "text" )
       end
     end # describe "with :to_chain target"
+    describe "with :to_chain target and translation" do
+      before :each do
+        @worker_bees = worker_bees = double
+        @poor_worker_bee = double
+        @boss = Class.new do 
+          extend Forwarder
+          forward_all :complaints, :problems, :tasks, :to_chain => [:@employees, :first], :as => :request
+          define_method :initialize do
+            @employees = worker_bees
+          end
+        end
+      end
+      it "fowards complaints to the chain" do
+        @worker_bees.should_receive( :first ).and_return @poor_worker_bee
+        @poor_worker_bee.should_receive( :request )
+        @boss.new.complaints
+      end
+      
+    end # describe "with :to_chain target and translation"
   end # describe "The forward_all Method"
 end # describe "assuring that the examples in README behave as described"
