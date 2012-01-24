@@ -1,5 +1,6 @@
 require 'forwardable'
 
+require 'forwarder/VERSION'
 require 'forwarder/meta'
 module Forwarder
 

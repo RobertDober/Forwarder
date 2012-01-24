@@ -1,6 +1,8 @@
+$:.unshift( File.expand_path( "../lib", __FILE__ ) )
+require 'forwarder/VERSION'
 Gem::Specification.new do |s|
   s.name        = 'forwarder'
-  s.version     = '0.1.0'
+  s.version     = Forwarder::VERSION
   s.summary     = "Making Delegation finally readable"
   s.description = %{Ruby's core Forwardable gets the job done(barely) and produces most unreadable code.
     This is a nonintrusive (as is Forwardable) module that allos to delegate methods to instance variables,
@@ -11,7 +13,7 @@ Gem::Specification.new do |s|
   s.files       = Dir.glob("lib/**/*.rb")
   s.files      += %w{LICENSE README.md}
   s.homepage    = 'https://github.com/RobertDober/Forwarder'
-  s.license     = %w{MIT}
+  s.licenses    = %w{MIT}
 
   s.required_ruby_version = '>= 1.8.7'
 end
