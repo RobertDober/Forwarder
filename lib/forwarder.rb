@@ -28,7 +28,7 @@ module Forwarder
 
   private
 
-<<<<<<< HEAD
+#<<<<<<< HEAD
   def forwarding_to_object opts
 #    p [:forwarding_to_object, opts]
     forwarding_with opts.merge( to: Meta::ObjectContainer.new(opts.object), with: opts.with( [] ) )
@@ -46,33 +46,33 @@ module Forwarder
   end
 
   def forward_with_forwardable opts
-=======
-  # Triggered by the presence of :to_object in forward's parameters
-  def forwarding_to_object message, opts
-    target = opts[ :to_object ]
-    forwarding_with message, opts.merge( to: Meta::ObjectContainer.new(target), with: opts.fetch( :with, [] ) )
-  end
-
-  # Handles the cases, where Forwardable can be used behind the scenes
-  # as a matter of fact :to was indicating a method or instance variable
-  # and :as was passed in (or defaults to the original message).
-  def forward_with_forwardable message, opts
-    to = opts.fetch :to
->>>>>>> master
+# =======
+#   # Triggered by the presence of :to_object in forward's parameters
+#   def forwarding_to_object message, opts
+#     target = opts[ :to_object ]
+#     forwarding_with message, opts.merge( to: Meta::ObjectContainer.new(target), with: opts.fetch( :with, [] ) )
+#   end
+# 
+#   # Handles the cases, where Forwardable can be used behind the scenes
+#   # as a matter of fact :to was indicating a method or instance variable
+#   # and :as was passed in (or defaults to the original message).
+#   def forward_with_forwardable message, opts
+#     to = opts.fetch :to
+# >>>>>>> master
     extend Forwardable
     def_delegator( *opts.params_for_delegator )
   end
 
-<<<<<<< HEAD
+#<<<<<<< HEAD
   def forward_with_chain opts
     return false unless opts.chain?
     forwarding_with opts
-=======
-  # Triggered by the presence of :to_chain in forward's parameters
-  def forward_with_chain message, opts
-    return false unless opts[:to_chain]
-    forwarding_with message, opts
->>>>>>> master
+# =======
+#   # Triggered by the presence of :to_chain in forward's parameters
+#   def forward_with_chain message, opts
+#     return false unless opts[:to_chain]
+#     forwarding_with message, opts
+# >>>>>>> master
   end
   # Transform blk into a normal parameter call the metaprogramming
   # stuff if needed and return nil iff we can do it with Forwardable

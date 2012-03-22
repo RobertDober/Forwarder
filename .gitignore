@@ -1,2 +1,3 @@
 *.vim
 *.gem
+.rspec

@@ -41,6 +41,10 @@ describe Forwarder do
       subject.a.should == 42
     end
 
+    it "forwards with additional parameters and after filter" do
+      
+    end
+
     it "forwards as a partial application" do
       @klass.module_eval do
         forward_to_self :sum1, as: :adding, with: 1
