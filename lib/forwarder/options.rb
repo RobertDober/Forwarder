@@ -78,7 +78,7 @@ module Forwarder
 
     class << self
       def legal_keys
-        @__legal_keys__ ||= [:after, :applying, :as, :before, :message, :to, :to_chain, :to_object, :with]
+        @__legal_keys__ ||= [:after, :applying, :as, :before, :blk, :message, :to, :to_chain, :to_object, :with]
       end
     end
   end # class Options

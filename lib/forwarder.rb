@@ -31,7 +31,9 @@ module Forwarder
 #<<<<<<< HEAD
   def forwarding_to_object opts
 #    p [:forwarding_to_object, opts]
-    forwarding_with opts.merge( to: Meta::ObjectContainer.new(opts.object), with: opts.with( [] ) )
+    # TODO: Need to get rid of to_object here?
+    debugger
+    forwarding_with Options.new( opts.merge( to: Meta::ObjectContainer.new(opts.object), with: opts.with( [] ) ) )
   end
 
   # Whenever the forward(s) cannot be implemented by def_delegator(s) eventually
