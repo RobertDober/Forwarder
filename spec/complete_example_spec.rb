@@ -10,7 +10,7 @@ class Example
   forward :sizes, to: :@values, as: :map, applying: :size
   forward :sum, to: :sizes, as: :inject do |a,e| a + e end
   forward :parents, to: self, as: :ancestors
-  forward :sum1, to: :sizes, as: :inject, applying: Proc.sum
+  forward :sum1, to: :sizes, as: :inject, applying: Integer.sum
   def value_at idx
     @values[idx]
   end

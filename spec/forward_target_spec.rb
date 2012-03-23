@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'forwarder/helpers/integer_helper'
+
 describe Forwarder do
   before :each do
     @klass = Class.new do
@@ -27,6 +29,7 @@ describe Forwarder do
       end
       subject.size.should == 3
     end
+
     it "forwards with renaming (as: other)" do
       @klass.module_eval do
         forward :count, to: :@name, as: :length
@@ -42,6 +45,10 @@ describe Forwarder do
     end
 
     it "forwards with additional parameters and after filter" do
+      @klass.module_eval do
+        forward :a, to: :a_hash, as: :[], with: :a, after: Integer.succ
+      end
+      subject.a.should == 43
       
     end
 

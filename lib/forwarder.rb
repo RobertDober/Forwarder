@@ -7,7 +7,7 @@ module Forwarder
 
   # delegates (forwards) a message to an object (indicated by :to)
   def forward message, opts={}, &blk
-    opts = Options.new message, opts, blk
+    opts = Options.new( opts.update( message: message, blk: blk) )
 #    p opts: opts
     forward_without_parsing opts
   end
@@ -16,12 +16,12 @@ module Forwarder
     opts = messages.pop
     raise ArgumentError, "need a Hash as last arg" unless Hash === opts
     messages.each do | msg |
-      forward_without_parsing Options.new( opts.merge( message: msg ) )
+      forward_without_parsing Options.new( opts.merge( message: msg, blk: blk ) )
     end
   end
 
   def forward_to_self message, opts={}, &blk
-    opts = Options.new message, opts.merge( to: Meta::SelfContainer ), blk
+    opts = Options.new opts.merge( to: Meta::SelfContainer, blk: blk, message: message )
     # TODO: is the merge below really needed
     forwarding_with opts.merge( with: opts.with( [] ) )
   end
@@ -40,11 +40,19 @@ module Forwarder
 #    p opts
     application, as, message, to, with = opts.values_at( :applying, :as, :message, :to, :with )
     as ||= message
+    to ||= opts.chain?
 
    # define_method( :__eval_receiver__, &Meta.eval_receiver_body )
     define_method( message, &Meta.eval_body( application, as, to, with ) )
   end
 
+  def forward_with_blk opts
+    return false unless opts.blk?
+    application, as, message, to, with = opts.values_at( :blk, :as, :message, :to, :with )
+    as ||= message
+    to ||= opts.chain?
+    define_method( message, &Meta.eval_body( application, as, to, with ) )
+  end
   def forward_with_forwardable opts
 # =======
 #   # Triggered by the presence of :to_object in forward's parameters
@@ -66,7 +74,13 @@ module Forwarder
 #<<<<<<< HEAD
   def forward_with_chain opts
     return false unless opts.chain?
-    forwarding_with opts
+    if opts.blk?
+      forward_with_blk opts
+      true
+    else
+      forwarding_with opts
+      true
+    end
 # =======
 #   # Triggered by the presence of :to_chain in forward's parameters
 #   def forward_with_chain message, opts
@@ -91,6 +105,7 @@ module Forwarder
 #    p [:forward_without_parsing, opts]
     return if forward_with_meta opts
     return if forward_with_chain opts
+    return if forward_with_blk opts
     forward_with_forwardable opts
   end
 
